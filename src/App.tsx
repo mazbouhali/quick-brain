@@ -84,10 +84,16 @@ function App() {
     // Save is handled by the editor component
   }, []);
 
+  const handleCloseNote = useCallback(() => {
+    setSelectedNoteId(null);
+    setSelectedNote(null);
+  }, []);
+
   useKeyboardShortcuts({
     onNewNote: handleNewNote,
     onSave: handleSave,
     onSearch: () => setShowSearch(true),
+    onEscape: handleCloseNote,
   });
 
   const handleSelectNote = useCallback((id: string) => {
@@ -138,6 +144,7 @@ function App() {
         onOpenQuiz={() => setShowQuiz(true)}
         hasNotesForReview={(notesForReview || 0) > 0}
         hasOnThisDayNotes={periods.length > 0}
+        theme={theme}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -148,6 +155,7 @@ function App() {
           tags={tags}
           selectedTag={selectedTag}
           onSelectTag={setSelectedTag}
+          theme={theme}
         />
 
         <NoteEditor
@@ -155,6 +163,8 @@ function App() {
           onSave={handleUpdateNote}
           onDelete={handleDeleteNote}
           onToggleMemorize={handleToggleMemorize}
+          onClose={handleCloseNote}
+          theme={theme}
         />
       </div>
 

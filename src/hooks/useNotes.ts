@@ -159,9 +159,16 @@ export function useKeyboardShortcuts(handlers: {
   onNewNote?: () => void;
   onSave?: () => void;
   onSearch?: () => void;
+  onEscape?: () => void;
 }) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle Escape key (no modifiers needed)
+      if (e.key === 'Escape') {
+        handlers.onEscape?.();
+        return;
+      }
+      
       if (e.metaKey || e.ctrlKey) {
         switch (e.key.toLowerCase()) {
           case 'n':

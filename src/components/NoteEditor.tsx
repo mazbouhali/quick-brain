@@ -9,9 +9,11 @@ interface NoteEditorProps {
   onSave: (updates: Partial<Note>) => void;
   onDelete: () => void;
   onToggleMemorize: () => void;
+  onClose: () => void;
+  theme: 'light' | 'dark';
 }
 
-export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEditorProps) {
+export function NoteEditor({ note, onSave, onDelete, onToggleMemorize, onClose, theme }: NoteEditorProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tagInput, setTagInput] = useState('');
@@ -19,6 +21,8 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
   const [showPreview, setShowPreview] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (note) {
@@ -65,7 +69,7 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
 
   if (!note) {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-500 bg-slate-900">
+      <div className={`flex-1 flex items-center justify-center ${isDark ? 'text-slate-500 bg-slate-900' : 'text-slate-400 bg-slate-50'}`}>
         <div className="text-center">
           <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -81,9 +85,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
   const freshnessColor = getFreshnessColor(freshness);
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-900 h-full">
+    <div className={`flex-1 flex flex-col h-full ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
       {/* Header */}
-      <div className="border-b border-slate-700 p-4">
+      <div className={`border-b p-4 ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div 
@@ -91,11 +95,11 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
               style={{ backgroundColor: freshnessColor }}
               title={`${getFreshnessLabel(freshness)} - Last viewed ${formatDistanceToNow(note.lastViewedAt)} ago`}
             />
-            <span className="text-xs text-slate-500">
+            <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
               {formatDistanceToNow(note.updatedAt, { addSuffix: true })}
             </span>
-            <span className="text-xs text-slate-600">|</span>
-            <span className="text-xs text-slate-500">
+            <span className={`text-xs ${isDark ? 'text-slate-600' : 'text-slate-300'}`}>|</span>
+            <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
               {note.viewCount} views
             </span>
           </div>
@@ -105,7 +109,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
               className={`px-3 py-1 rounded text-sm transition-colors ${
                 note.memorize 
                   ? 'bg-purple-600 text-white' 
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : isDark 
+                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' 
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
               }`}
               title={note.memorize ? 'Remove from flashcards' : 'Add to flashcards'}
             >
@@ -116,7 +122,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
               className={`px-3 py-1 rounded text-sm transition-colors ${
                 showPreview 
                   ? 'bg-blue-600 text-white' 
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : isDark 
+                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' 
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
               }`}
             >
               {showPreview ? 'Edit' : 'Preview'}
@@ -127,7 +135,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
               className={`px-3 py-1 rounded text-sm transition-colors ${
                 hasChanges 
                   ? 'bg-green-600 text-white hover:bg-green-500' 
-                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                  : isDark 
+                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed' 
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
               Save
@@ -138,6 +148,19 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
             >
               Delete
             </button>
+            <button
+              onClick={onClose}
+              className={`p-1 rounded transition-colors ${
+                isDark 
+                  ? 'hover:bg-slate-700 text-slate-400 hover:text-white' 
+                  : 'hover:bg-slate-200 text-slate-400 hover:text-slate-600'
+              }`}
+              title="Close (Esc)"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
         
@@ -147,7 +170,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Note title..."
-          className="w-full bg-transparent text-2xl font-bold text-white placeholder-slate-500 outline-none"
+          className={`w-full bg-transparent text-2xl font-bold outline-none ${
+            isDark ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400'
+          }`}
         />
         
         {/* Tags */}
@@ -172,7 +197,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleAddTag}
             placeholder="Add tag..."
-            className="bg-transparent text-sm text-slate-300 placeholder-slate-500 outline-none min-w-24"
+            className={`bg-transparent text-sm outline-none min-w-24 ${
+              isDark ? 'text-slate-300 placeholder-slate-500' : 'text-slate-600 placeholder-slate-400'
+            }`}
           />
         </div>
       </div>
@@ -180,7 +207,7 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {showPreview ? (
-          <div className="p-6 overflow-y-auto h-full markdown-content text-slate-200">
+          <div className={`p-6 overflow-y-auto h-full markdown-content ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {content || '*No content*'}
             </ReactMarkdown>
@@ -191,7 +218,9 @@ export function NoteEditor({ note, onSave, onDelete, onToggleMemorize }: NoteEdi
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Start writing... (Markdown supported)"
-            className="w-full h-full p-6 bg-transparent text-slate-200 placeholder-slate-500 outline-none resize-none font-mono text-sm leading-relaxed"
+            className={`w-full h-full p-6 bg-transparent outline-none resize-none font-mono text-sm leading-relaxed ${
+              isDark ? 'text-slate-200 placeholder-slate-500' : 'text-slate-800 placeholder-slate-400'
+            }`}
           />
         )}
       </div>
